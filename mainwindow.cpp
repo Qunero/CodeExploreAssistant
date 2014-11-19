@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
             "          CodeExploreAssistant V" APP_REVISION " Build@%1      \n"
             "    This software is for quickly convert decimal numbers\n"
             "to hex numbers or in verse convert from hex to decimal.\n"
+            "    When 'Show Detail' checkbox is checked, you will quickly\n"
+            "get the Explaining Code with its value match the input number.\n"
             "--------------------------------------------------------\n"
             "Author: QuNengrong(Neo Nengrong Qu)\n"
             "Email : Quner612#qq.com  \n"

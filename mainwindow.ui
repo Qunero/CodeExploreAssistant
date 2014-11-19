@@ -183,7 +183,7 @@
     <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+W, Ctrl+Q</string>
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="action_About">
