@@ -33,10 +33,13 @@ private slots:
 
     void on_action_About_triggered();
 
+    void on_checkBox_showDetail_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
-    qlonglong _sharedNumberValue;
-    QString _strMsgAboutSoftware;
+    bool isCfgFileLoaded;
+    qlonglong sharedNumberValue;
+    QString aboutSoftwareMsg;
 
     void updateUiFromDec2Hex();
     void updateUiFromHex2Dec();
