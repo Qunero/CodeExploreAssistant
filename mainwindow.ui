@@ -508,7 +508,7 @@
             <property name="minimumSize">
              <size>
               <width>130</width>
-              <height>200</height>
+              <height>160</height>
              </size>
             </property>
             <property name="title">
@@ -598,7 +598,7 @@
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>29</height>
+                 <height>3</height>
                 </size>
                </property>
               </spacer>
@@ -666,7 +666,7 @@
             <property name="minimumSize">
              <size>
               <width>80</width>
-              <height>62</height>
+              <height>100</height>
              </size>
             </property>
             <property name="maximumSize">
