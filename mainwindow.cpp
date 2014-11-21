@@ -30,7 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QRegExp reHex("(0[Xx])?0*[A-Fa-f0-9]{0,15}\\s*"); // max is 0x7fffffffffffffff
     ui->lineEdit_hex->setValidator(new QRegExpValidator(reHex));
     ui->checkBox_autoConvert->toggled(true);
-    ui->pushButtonConvertDec2Hex->setFocus();
+    ui->pushButtonConvertDec2Hex->setDefault(true);
+    ui->lineEdit_dec->setFocus();
 }
 
 MainWindow::~MainWindow()
