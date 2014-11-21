@@ -32,6 +32,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->checkBox_autoConvert->toggled(true);
     ui->pushButtonConvertDec2Hex->setDefault(true);
     ui->lineEdit_dec->setFocus();
+
+    // for MVC
+    cfgFileListModel.setColumnCount(3);
+    cfgFileListModel.setHorizontalHeaderLabels(QStringList()<<"Group Name"<<"Autoload"<<"File path");
+    ui->tableView_configuredFileList->setModel(&cfgFileListModel);
+    // set read only and select whole row at once
+    ui->tableView_configuredFileList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView_configuredFileList->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 MainWindow::~MainWindow()
@@ -49,6 +57,13 @@ void MainWindow::updateUiFromHex2Dec()
 {
     QString dec = QString::number(sharedNumberValue, 10);
     ui->lineEdit_dec->setText(dec.toUpper());
+}
+
+void MainWindow::clearChooseFileInfo()
+{
+    ui->lineEdit_cfgFilePath->clear();
+    ui->lineEdit_groupName->clear();
+    ui->checkBox_autoloadCfgFile->setChecked(false);
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
@@ -115,4 +130,33 @@ void MainWindow::on_checkBox_showDetail_toggled(bool checked)
 
         ui->checkBox_showDetail->setChecked(false);
     }
+}
+
+void MainWindow::on_pushButton_addToList_clicked()
+{
+    if (ui->lineEdit_groupName->text().isEmpty()
+            || ui->lineEdit_cfgFilePath->text().isEmpty())
+    {
+        return;
+    }
+
+    // todo: ignore same file
+    // save choosen configure file to list
+    QList<QStandardItem *> items;
+    items.append(new QStandardItem(ui->lineEdit_groupName->text()));
+    items.append(new QStandardItem(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No"));
+    items.append(new QStandardItem(ui->lineEdit_cfgFilePath->text()));
+    cfgFileListModel.insertRow(cfgFileListModel.rowCount(), items);
+
+    clearChooseFileInfo();
+}
+
+void MainWindow::on_pushButton_modifyCfgFiel_clicked()
+{
+    /*QItemSelectionModel selection = ui->tableView_configuredFileList->selectionModel();
+    selection.selection();
+    QList<QStandardItem *> items = cfgFileListModel.data(ui->tableView_configuredFileList->currentIndex());
+    ui->lineEdit_groupName->setText(iteams[0]);
+    ui->checkBox_autoloadCfgFile->setChecked(items[1]->text().compare("Yes")==0?true:false);
+    ui->lineEdit_cfgFilePath->setText(items[2]);*/
 }

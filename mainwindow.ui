@@ -630,7 +630,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>&amp;Add to List</string>
+                  <string>&amp;Save to List</string>
                  </property>
                 </widget>
                </item>
