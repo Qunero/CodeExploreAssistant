@@ -66,6 +66,8 @@ void MainWindow::modifyCfgFileGroupInfo()
         qDebug() << "selected row info : index.row=" <<index.row()<<"index.column=" <<index.column();
         rowInfo.append(cfgFileListModel.data(index).toString());
     }
+    isInModifyCfgFileGroupInfoState = true;
+    currentRowOfCfgFileList = ui->tableView_configuredFileList->currentIndex().row();
     updateChoosenFileInfo(rowInfo);
 }
 
@@ -86,6 +88,8 @@ void MainWindow::clearChoosenFileInfo()
     ui->lineEdit_cfgFilePath->clear();
     ui->lineEdit_groupName->clear();
     ui->checkBox_autoloadCfgFile->setChecked(false);
+    isInModifyCfgFileGroupInfoState = false;
+    currentRowOfCfgFileList = 0;
 }
 
 void MainWindow::updateChoosenFileInfo(QStringList rowInfo)
@@ -199,10 +203,23 @@ void MainWindow::on_pushButton_saveToList_clicked()
     // todo: ignore same file
     // save choosen configure file to list
     QList<QStandardItem *> items;
-    items.append(new QStandardItem(ui->lineEdit_groupName->text()));
-    items.append(new QStandardItem(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No"));
-    items.append(new QStandardItem(ui->lineEdit_cfgFilePath->text()));
-    cfgFileListModel.appendRow(items);
+    QStandardItem * groupNameItem = new QStandardItem(ui->lineEdit_groupName->text());
+    QStandardItem * autoloadItem = new QStandardItem(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No");
+    QStandardItem * filePathItem = new QStandardItem(ui->lineEdit_cfgFilePath->text());
+
+    if (isInModifyCfgFileGroupInfoState)
+    {
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_GROUP_NAME, groupNameItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_AUTOLOAD, autoloadItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_CFG_FILE_PATH, filePathItem);
+    }
+    else
+    {
+        items.append(groupNameItem);
+        items.append(autoloadItem);
+        items.append(filePathItem);
+        cfgFileListModel.appendRow(items);
+    }
 
     clearChoosenFileInfo();
 }
@@ -267,4 +284,15 @@ void MainWindow::on_pushButton_chooseCfgFile_clicked()
 void MainWindow::on_lineEdit_cfgFilePath_textChanged(const QString &arg1)
 {
     currentFileName = arg1;
+}
+
+void MainWindow::on_pushButton_loadAllCfgFile_clicked()
+{
+    // update groups in explore page
+    QStringList groups("All");
+    for (int row=0; row < cfgFileListModel.rowCount(); row++) {
+        groups.append(cfgFileListModel.item(row,0)->data(Qt::DisplayRole).toString());
+    }
+    ui->comboBox_chooseGroup->clear();
+    ui->comboBox_chooseGroup->addItems(groups);
 }

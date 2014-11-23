@@ -61,9 +61,13 @@ private slots:
 
     void on_lineEdit_cfgFilePath_textChanged(const QString &arg1);
 
+    void on_pushButton_loadAllCfgFile_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool isCfgFileLoaded;
+    bool isInModifyCfgFileGroupInfoState;
+    int currentRowOfCfgFileList;
     qlonglong sharedNumberValue;
     QString aboutSoftwareMsg;
     QString currentFileName;
