@@ -444,7 +444,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_modifyCfgFiel">
+                <widget class="QPushButton" name="pushButton_modifyCfgFile">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -629,7 +629,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_addToList">
+                <widget class="QPushButton" name="pushButton_saveToList">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -777,7 +777,7 @@
   <tabstop>lineEdit_cfgFilePath</tabstop>
   <tabstop>lineEdit_groupName</tabstop>
   <tabstop>checkBox_autoloadCfgFile</tabstop>
-  <tabstop>pushButton_addToList</tabstop>
+  <tabstop>pushButton_saveToList</tabstop>
   <tabstop>pushButton_loadAllCfgFile</tabstop>
   <tabstop>comboBox_chooseGroup</tabstop>
   <tabstop>tableWidget_codeDetail</tabstop>
@@ -785,7 +785,7 @@
   <tabstop>pushButton_chooseCfgFile</tabstop>
   <tabstop>tableView_configuredFileList</tabstop>
   <tabstop>pushButton_deleteCfgFile</tabstop>
-  <tabstop>pushButton_modifyCfgFiel</tabstop>
+  <tabstop>pushButton_modifyCfgFile</tabstop>
   <tabstop>pushButtonConvertHex2Dec</tabstop>
   <tabstop>lineEdit_hex</tabstop>
   <tabstop>pushButtonConvertDec2Hex</tabstop>

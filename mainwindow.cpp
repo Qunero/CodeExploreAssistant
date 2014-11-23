@@ -33,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonConvertDec2Hex->setDefault(true);
     ui->lineEdit_dec->setFocus();
 
+    // configure page
+    QRegExp reGroupName("[_a-zA-Z0-9]{1,16}");
+    ui->lineEdit_groupName->setValidator(new QRegExpValidator(reGroupName));
+
     // for MVC
     QStringList headerLabels;
     headerLabels.insert(EM_COLUMN_GROUP_NAME, "Group Name");
@@ -44,11 +48,25 @@ MainWindow::MainWindow(QWidget *parent) :
     // set read only and select whole row at once
     ui->tableView_configuredFileList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView_configuredFileList->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::modifyCfgFileGroupInfo()
+{
+    QModelIndexList selectedList = ui->tableView_configuredFileList->selectionModel()->selectedIndexes();
+    QStringList rowInfo;
+    foreach (QModelIndex index, selectedList)
+    {
+        qDebug() << "selected row info : index.row=" <<index.row()<<"index.column=" <<index.column();
+        rowInfo.append(cfgFileListModel.data(index).toString());
+    }
+    updateChoosenFileInfo(rowInfo);
 }
 
 void MainWindow::updateUiFromDec2Hex()
@@ -89,6 +107,11 @@ bool MainWindow::hasValidSelectedCfgFile()
         return false;
     }
     return true;
+}
+
+bool MainWindow::isCurrentFileExists()
+{
+    return QFile(currentFileName).exists();
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
@@ -157,7 +180,7 @@ void MainWindow::on_checkBox_showDetail_toggled(bool checked)
     }
 }
 
-void MainWindow::on_pushButton_addToList_clicked()
+void MainWindow::on_pushButton_saveToList_clicked()
 {
     if (ui->lineEdit_groupName->text().isEmpty()
             || ui->lineEdit_cfgFilePath->text().isEmpty())
@@ -165,6 +188,14 @@ void MainWindow::on_pushButton_addToList_clicked()
         return;
     }
 
+    if (! isCurrentFileExists())
+    {
+        QMessageBox::critical(this,
+                              "File Not Exists",
+                              QString("The configure file <%1> is not exists, please check file path, or you may try choose another one").arg(currentFileName),
+                              QMessageBox::Ok);
+        return;
+    }
     // todo: ignore same file
     // save choosen configure file to list
     QList<QStandardItem *> items;
@@ -176,21 +207,14 @@ void MainWindow::on_pushButton_addToList_clicked()
     clearChoosenFileInfo();
 }
 
-void MainWindow::on_pushButton_modifyCfgFiel_clicked()
+void MainWindow::on_pushButton_modifyCfgFile_clicked()
 {
     if (! hasValidSelectedCfgFile())
     {
         return;
     }
 
-    QModelIndexList selectedList = ui->tableView_configuredFileList->selectionModel()->selectedIndexes();
-    QStringList rowInfo;
-    foreach (QModelIndex index, selectedList)
-    {
-        qDebug() << "selected row info : index.row=" <<index.row()<<"index.column=" <<index.column();
-        rowInfo.append(cfgFileListModel.data(index).toString());
-    }
-    updateChoosenFileInfo(rowInfo);
+    modifyCfgFileGroupInfo();
 }
 
 void MainWindow::on_pushButton_openDetail_clicked()
@@ -226,4 +250,21 @@ void MainWindow::on_pushButton_deleteCfgFile_clicked()
 void MainWindow::on_pushButton_clear_clicked()
 {
     clearChoosenFileInfo();
+}
+
+void MainWindow::on_pushButton_chooseCfgFile_clicked()
+{
+    currentFileName = QFileDialog::getOpenFileName(this, tr("Choose a configure file"),
+                                                    ".",
+                                                    tr("Configure File (*.cfg *.txt);;All(*.*)"));
+    if (currentFileName.isNull())
+    {
+        return;
+    }
+    ui->lineEdit_cfgFilePath->setText(currentFileName);
+}
+
+void MainWindow::on_lineEdit_cfgFilePath_textChanged(const QString &arg1)
+{
+    currentFileName = arg1;
 }

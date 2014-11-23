@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDate>
+#include <QFileDialog>
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QDate>
 #include <QStandardItemModel>
 #include <QtDebug>
 
@@ -30,6 +31,8 @@ public:
     ~MainWindow();
 
 private slots:
+    void modifyCfgFileGroupInfo();
+
     void on_checkBox_autoConvert_toggled(bool checked);
 
     void on_pushButtonConvertDec2Hex_clicked();
@@ -44,9 +47,9 @@ private slots:
 
     void on_checkBox_showDetail_toggled(bool checked);
 
-    void on_pushButton_addToList_clicked();
+    void on_pushButton_saveToList_clicked();
 
-    void on_pushButton_modifyCfgFiel_clicked();
+    void on_pushButton_modifyCfgFile_clicked();
 
     void on_pushButton_openDetail_clicked();
 
@@ -54,11 +57,16 @@ private slots:
 
     void on_pushButton_clear_clicked();
 
+    void on_pushButton_chooseCfgFile_clicked();
+
+    void on_lineEdit_cfgFilePath_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     bool isCfgFileLoaded;
     qlonglong sharedNumberValue;
     QString aboutSoftwareMsg;
+    QString currentFileName;
     QStandardItemModel cfgFileListModel;
 
     void updateUiFromDec2Hex();
@@ -66,6 +74,7 @@ private:
     void clearChoosenFileInfo();
     void updateChoosenFileInfo(QStringList rowInfo);
     bool hasValidSelectedCfgFile();
+    bool isCurrentFileExists();
 };
 
 #endif // MAINWINDOW_H
