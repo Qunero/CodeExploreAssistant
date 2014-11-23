@@ -34,8 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_dec->setFocus();
 
     // for MVC
-    cfgFileListModel.setColumnCount(3);
-    cfgFileListModel.setHorizontalHeaderLabels(QStringList()<<"Group Name"<<"Autoload"<<"File path");
+    QStringList headerLabels;
+    headerLabels.insert(EM_COLUMN_GROUP_NAME, "Group Name");
+    headerLabels.insert(EM_COLUMN_AUTOLOAD, "Autoload");
+    headerLabels.insert(EM_COLUMN_CFG_FILE_PATH, "File Path");
+    cfgFileListModel.setColumnCount(EM_COLOUM_COUNT);
+    cfgFileListModel.setHorizontalHeaderLabels(headerLabels);
     ui->tableView_configuredFileList->setModel(&cfgFileListModel);
     // set read only and select whole row at once
     ui->tableView_configuredFileList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -59,11 +63,32 @@ void MainWindow::updateUiFromHex2Dec()
     ui->lineEdit_dec->setText(dec.toUpper());
 }
 
-void MainWindow::clearChooseFileInfo()
+void MainWindow::clearChoosenFileInfo()
 {
     ui->lineEdit_cfgFilePath->clear();
     ui->lineEdit_groupName->clear();
     ui->checkBox_autoloadCfgFile->setChecked(false);
+}
+
+void MainWindow::updateChoosenFileInfo(QStringList rowInfo)
+{
+    ui->lineEdit_groupName->setText(rowInfo[EM_COLUMN_GROUP_NAME]);
+    ui->checkBox_autoloadCfgFile->setChecked(rowInfo[EM_COLUMN_GROUP_NAME].compare("Yes")==0?true:false);
+    ui->lineEdit_cfgFilePath->setText(rowInfo[EM_COLUMN_CFG_FILE_PATH]);
+}
+
+bool MainWindow::hasValidSelectedCfgFile()
+{
+    // check weather has a valid choosen file
+    if (! ui->tableView_configuredFileList->currentIndex().isValid())
+    {
+        QMessageBox::warning(this,
+                             "Selection Needed",
+                             "You need to select a configured file firstly.",
+                             QMessageBox::Ok);
+        return false;
+    }
+    return true;
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
@@ -146,17 +171,59 @@ void MainWindow::on_pushButton_addToList_clicked()
     items.append(new QStandardItem(ui->lineEdit_groupName->text()));
     items.append(new QStandardItem(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No"));
     items.append(new QStandardItem(ui->lineEdit_cfgFilePath->text()));
-    cfgFileListModel.insertRow(cfgFileListModel.rowCount(), items);
+    cfgFileListModel.appendRow(items);
 
-    clearChooseFileInfo();
+    clearChoosenFileInfo();
 }
 
 void MainWindow::on_pushButton_modifyCfgFiel_clicked()
 {
-    /*QItemSelectionModel selection = ui->tableView_configuredFileList->selectionModel();
-    selection.selection();
-    QList<QStandardItem *> items = cfgFileListModel.data(ui->tableView_configuredFileList->currentIndex());
-    ui->lineEdit_groupName->setText(iteams[0]);
-    ui->checkBox_autoloadCfgFile->setChecked(items[1]->text().compare("Yes")==0?true:false);
-    ui->lineEdit_cfgFilePath->setText(items[2]);*/
+    if (! hasValidSelectedCfgFile())
+    {
+        return;
+    }
+
+    QModelIndexList selectedList = ui->tableView_configuredFileList->selectionModel()->selectedIndexes();
+    QStringList rowInfo;
+    foreach (QModelIndex index, selectedList)
+    {
+        qDebug() << "selected row info : index.row=" <<index.row()<<"index.column=" <<index.column();
+        rowInfo.append(cfgFileListModel.data(index).toString());
+    }
+    updateChoosenFileInfo(rowInfo);
+}
+
+void MainWindow::on_pushButton_openDetail_clicked()
+{
+    if (! hasValidSelectedCfgFile())
+    {
+        return;
+    }
+
+}
+
+void MainWindow::on_pushButton_deleteCfgFile_clicked()
+{
+    if (! hasValidSelectedCfgFile())
+    {
+        return;
+    }
+    QString cfmMsg =  QString("    You have choosen a configure file at row %1,\n%2")
+            .arg(ui->tableView_configuredFileList->currentIndex().row() + 1)
+            .arg("Do you really want to delete this configure file?");
+    if (QMessageBox::No == QMessageBox::warning(this,
+                                                "Confirm Deletion",
+                                                cfmMsg,
+                                                QMessageBox::Yes | QMessageBox::No,
+                                                QMessageBox::No))
+    {
+        return;
+    }
+
+    cfgFileListModel.removeRow(ui->tableView_configuredFileList->currentIndex().row());
+}
+
+void MainWindow::on_pushButton_clear_clicked()
+{
+    clearChoosenFileInfo();
 }
