@@ -254,14 +254,14 @@ void MainWindow::on_pushButton_clear_clicked()
 
 void MainWindow::on_pushButton_chooseCfgFile_clicked()
 {
-    currentFileName = QFileDialog::getOpenFileName(this, tr("Choose a configure file"),
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Choose a configure file"),
                                                     ".",
                                                     tr("Configure File (*.cfg *.txt);;All(*.*)"));
-    if (currentFileName.isNull())
+    if (fileName.isNull())
     {
         return;
     }
-    ui->lineEdit_cfgFilePath->setText(currentFileName);
+    ui->lineEdit_cfgFilePath->setText(fileName);
 }
 
 void MainWindow::on_lineEdit_cfgFilePath_textChanged(const QString &arg1)
