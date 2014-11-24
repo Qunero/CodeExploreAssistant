@@ -84,6 +84,7 @@ private:
     bool hasValidSelectedCfgFile();
     bool isCurrentFileExists();
     void saveRowToCfgFileListModel(QStringList rowInfo);
+    bool appInit();
 };
 
 #endif // MAINWINDOW_H

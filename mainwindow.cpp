@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutSoftwareMsg = QString(msgFmt).arg(date);
     sharedNumberValue = 0;
     isCfgFileLoaded = false;
+    isInModifyCfgFileGroupInfoState = false;
 
     ui->setupUi(this);
     QRegExp reDec("0*[0-9]{0,19}\\s*"); //max is 9223372036854775807
@@ -50,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView_configuredFileList->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // app init and autoload some cfg file
+    appInit();
 
     QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
 }
@@ -97,7 +99,7 @@ void MainWindow::clearChoosenFileInfo()
 void MainWindow::updateChoosenFileInfo(QStringList rowInfo)
 {
     ui->lineEdit_groupName->setText(rowInfo[EM_COLUMN_GROUP_NAME]);
-    ui->checkBox_autoloadCfgFile->setChecked(rowInfo[EM_COLUMN_GROUP_NAME].compare("Yes")==0?true:false);
+    ui->checkBox_autoloadCfgFile->setChecked(rowInfo[EM_COLUMN_AUTOLOAD].compare("Yes", Qt::CaseInsensitive)==0?true:false);
     ui->lineEdit_cfgFilePath->setText(rowInfo[EM_COLUMN_CFG_FILE_PATH]);
 }
 
@@ -133,6 +135,7 @@ void MainWindow::saveRowToCfgFileListModel(QStringList rowInfo)
         cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_GROUP_NAME, groupNameItem);
         cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_AUTOLOAD, autoloadItem);
         cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_CFG_FILE_PATH, filePathItem);
+        qDebug() << "Save Cfg File to list: " << rowInfo;
     }
     else
     {
@@ -140,7 +143,39 @@ void MainWindow::saveRowToCfgFileListModel(QStringList rowInfo)
         items.append(autoloadItem);
         items.append(filePathItem);
         cfgFileListModel.appendRow(items);
+        qDebug() << "Add Cfg File to list: " << rowInfo;
     }
+}
+
+bool MainWindow::appInit()
+{
+    // check init file
+    QFile iniFile(APP_INIT_FILE_PATH);
+    if (! iniFile.exists())
+    {
+        qDebug() << APP_INIT_FILE_PATH << " is not exists!!!";
+        return false;
+    }
+
+    if (! iniFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return false;
+    }
+
+    QTextStream in(&iniFile);
+    while (! in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList row = line.split(CfgFileColumnSep);
+        qDebug() << row;
+        if (row.count() < 2)
+        {
+            iniFile.close();
+            return false;
+        }
+        saveRowToCfgFileListModel(row);
+    }
+    return true;
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
