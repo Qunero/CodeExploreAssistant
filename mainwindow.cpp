@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableView_configuredFileList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView_configuredFileList->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    // app init and autoload some cfg file
+
     QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
 }
 
@@ -116,6 +118,29 @@ bool MainWindow::hasValidSelectedCfgFile()
 bool MainWindow::isCurrentFileExists()
 {
     return QFile(currentFileName).exists();
+}
+
+void MainWindow::saveRowToCfgFileListModel(QStringList rowInfo)
+{
+    // save choosen configure file to list
+    QList<QStandardItem *> items;
+    QStandardItem * groupNameItem = new QStandardItem(rowInfo[EM_COLUMN_GROUP_NAME]);
+    QStandardItem * autoloadItem = new QStandardItem(rowInfo[EM_COLUMN_AUTOLOAD]);
+    QStandardItem * filePathItem = new QStandardItem(rowInfo[EM_COLUMN_CFG_FILE_PATH]);
+
+    if (isInModifyCfgFileGroupInfoState)
+    {
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_GROUP_NAME, groupNameItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_AUTOLOAD, autoloadItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_CFG_FILE_PATH, filePathItem);
+    }
+    else
+    {
+        items.append(groupNameItem);
+        items.append(autoloadItem);
+        items.append(filePathItem);
+        cfgFileListModel.appendRow(items);
+    }
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
@@ -186,9 +211,23 @@ void MainWindow::on_checkBox_showDetail_toggled(bool checked)
 
 void MainWindow::on_pushButton_saveToList_clicked()
 {
-    if (ui->lineEdit_groupName->text().isEmpty()
-            || ui->lineEdit_cfgFilePath->text().isEmpty())
+    if (ui->lineEdit_cfgFilePath->text().isEmpty())
     {
+        QMessageBox::warning(this,
+                             "Choose Configure File",
+                             "The <File Path> can not be empty, please choose a configure file.",
+                             QMessageBox::Ok);
+        ui->pushButton_chooseCfgFile->setFocus();
+        return;
+    }
+
+    if (ui->lineEdit_groupName->text().isEmpty())
+    {
+        QMessageBox::warning(this,
+                             "Setting Group Name",
+                             "    The <Group Name> can not be empty, please set a proper \ngroup name for this configure file.",
+                             QMessageBox::Ok);
+        ui->lineEdit_groupName->setFocus();
         return;
     }
 
@@ -200,26 +239,14 @@ void MainWindow::on_pushButton_saveToList_clicked()
                               QMessageBox::Ok);
         return;
     }
-    // todo: ignore same file
-    // save choosen configure file to list
-    QList<QStandardItem *> items;
-    QStandardItem * groupNameItem = new QStandardItem(ui->lineEdit_groupName->text());
-    QStandardItem * autoloadItem = new QStandardItem(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No");
-    QStandardItem * filePathItem = new QStandardItem(ui->lineEdit_cfgFilePath->text());
 
-    if (isInModifyCfgFileGroupInfoState)
-    {
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_GROUP_NAME, groupNameItem);
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_AUTOLOAD, autoloadItem);
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_CFG_FILE_PATH, filePathItem);
-    }
-    else
-    {
-        items.append(groupNameItem);
-        items.append(autoloadItem);
-        items.append(filePathItem);
-        cfgFileListModel.appendRow(items);
-    }
+    // todo: ignore same file
+    QStringList row;
+    row.append(ui->lineEdit_groupName->text());
+    row.append(ui->checkBox_autoloadCfgFile->isChecked()?"Yes":"No");
+    row.append(ui->lineEdit_cfgFilePath->text());
+
+    saveRowToCfgFileListModel(row);
 
     clearChoosenFileInfo();
 }

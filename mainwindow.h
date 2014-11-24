@@ -15,6 +15,10 @@ namespace Ui {
 class MainWindow;
 }
 
+const QString APP_INIT_FILE_PATH = "config/cea.ini";
+const QString APP_CFG_FILE_MAGIC_HEADER = "/*CEA_CFG_FILE*/";
+const QString CfgFileColumnSep = " // ";
+
 enum{
     EM_COLUMN_GROUP_NAME     = 0,
     EM_COLUMN_AUTOLOAD       = 1,
@@ -79,6 +83,7 @@ private:
     void updateChoosenFileInfo(QStringList rowInfo);
     bool hasValidSelectedCfgFile();
     bool isCurrentFileExists();
+    void saveRowToCfgFileListModel(QStringList rowInfo);
 };
 
 #endif // MAINWINDOW_H
