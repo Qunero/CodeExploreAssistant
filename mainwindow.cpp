@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // app init and autoload some cfg file
     appInit();
+    proxyModel.setSourceModel(&sourceModel);
+    ui->tableView_codeDetail->setModel(&proxyModel);
+    ui->tableView_codeDetail->sortByColumn(1, Qt::AscendingOrder);
+    loadCfgFiles();
 
     QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
 }
@@ -176,6 +180,11 @@ bool MainWindow::appInit()
         saveRowToCfgFileListModel(row);
     }
     return true;
+}
+
+bool MainWindow::loadCfgFiles()
+{
+    // TODO;
 }
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)

@@ -323,32 +323,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QTableWidget" name="tableWidget_codeDetail">
-             <column>
-              <property name="text">
-               <string>Code</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Explaining</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Comment</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-              </property>
-             </column>
-            </widget>
+            <widget class="QTableView" name="tableView_codeDetail"/>
            </item>
           </layout>
          </widget>
@@ -780,7 +755,7 @@
   <tabstop>pushButton_saveToList</tabstop>
   <tabstop>pushButton_loadAllCfgFile</tabstop>
   <tabstop>comboBox_chooseGroup</tabstop>
-  <tabstop>tableWidget_codeDetail</tabstop>
+  <tabstop>tableView_codeDetail</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>pushButton_chooseCfgFile</tabstop>
   <tabstop>tableView_configuredFileList</tabstop>

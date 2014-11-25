@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QtDebug>
 
@@ -75,6 +76,8 @@ private:
     qlonglong sharedNumberValue;
     QString aboutSoftwareMsg;
     QString currentFileName;
+    QSortFilterProxyModel proxyModel;
+    QStandardItemModel sourceModel;
     QStandardItemModel cfgFileListModel;
 
     void updateUiFromDec2Hex();
@@ -85,6 +88,7 @@ private:
     bool isCurrentFileExists();
     void saveRowToCfgFileListModel(QStringList rowInfo);
     bool appInit();
+    bool loadCfgFiles();
 };
 
 #endif // MAINWINDOW_H
