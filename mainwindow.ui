@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>588</width>
     <height>400</height>
    </rect>
   </property>
@@ -410,9 +410,12 @@
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
+                   <width>20</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -442,9 +445,35 @@
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_unloadAllCfgFile">
+                 <property name="text">
+                  <string>Unload All</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_10">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -482,7 +511,7 @@
            <widget class="QGroupBox" name="groupBox_group">
             <property name="minimumSize">
              <size>
-              <width>130</width>
+              <width>200</width>
               <height>160</height>
              </size>
             </property>
@@ -582,6 +611,12 @@
               <layout class="QHBoxLayout" name="horizontalLayout_8">
                <item>
                 <widget class="QPushButton" name="pushButton_clear">
+                 <property name="minimumSize">
+                  <size>
+                   <width>60</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>Clear</string>
                  </property>
@@ -606,13 +641,19 @@
                <item>
                 <widget class="QPushButton" name="pushButton_saveToList">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>82</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string>&amp;Save to List</string>
+                  <string>&amp;Save To List</string>
                  </property>
                 </widget>
                </item>
@@ -666,7 +707,20 @@
             <property name="title">
              <string>Detail Check or Edit</string>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_10">
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <spacer name="horizontalSpacer_11">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>21</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item>
               <widget class="QPushButton" name="pushButton_openDetail">
                <property name="sizePolicy">
@@ -677,7 +731,7 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>60</width>
+                 <width>120</width>
                  <height>60</height>
                 </size>
                </property>
@@ -691,6 +745,19 @@
                 <string>Open</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_12">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>21</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -708,7 +775,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>588</width>
      <height>23</height>
     </rect>
    </property>

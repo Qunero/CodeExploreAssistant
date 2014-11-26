@@ -68,6 +68,8 @@ private slots:
 
     void on_pushButton_loadAllCfgFile_clicked();
 
+    void on_pushButton_unloadAllCfgFile_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool isCfgFileLoaded;
@@ -76,7 +78,9 @@ private:
     qlonglong sharedNumberValue;
     QString aboutSoftwareMsg;
     QString currentFileName;
-    QSortFilterProxyModel proxyModel;
+    QStringList codeExplainingHeader;
+    QSortFilterProxyModel groupProxyModel;
+    QSortFilterProxyModel codeProxyModel;
     QStandardItemModel sourceModel;
     QStandardItemModel cfgFileListModel;
 
@@ -89,6 +93,8 @@ private:
     void saveRowToCfgFileListModel(QStringList rowInfo);
     bool appInit();
     bool loadCfgFiles();
+    bool loadOneCfgFile(QString &group, QString &filePath);
+    void saveRowToSourceModel(QStringList rowInfo);
 };
 
 #endif // MAINWINDOW_H

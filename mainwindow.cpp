@@ -52,10 +52,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // app init and autoload some cfg file
     appInit();
-    proxyModel.setSourceModel(&sourceModel);
-    ui->tableView_codeDetail->setModel(&proxyModel);
+    codeExplainingHeader << "Explaining" << "Code in Hex" << "Detail" << "Group";
+    groupProxyModel.setSourceModel(&sourceModel);
+    codeProxyModel.setSourceModel(&groupProxyModel);
+    ui->tableView_codeDetail->setModel(&codeProxyModel);
     ui->tableView_codeDetail->sortByColumn(1, Qt::AscendingOrder);
-    loadCfgFiles();
+    ui->tableView_codeDetail->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    if (loadCfgFiles())
+    {
+        isCfgFileLoaded = true;
+    }
 
     QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
 }
@@ -184,8 +190,84 @@ bool MainWindow::appInit()
 
 bool MainWindow::loadCfgFiles()
 {
-    // TODO;
+    QString group;
+    QString filePath;
+    int loadedFileCount = 0;
+    sourceModel.setColumnCount(4);
+    sourceModel.setHorizontalHeaderLabels(codeExplainingHeader);
+    for (int row=0; row<cfgFileListModel.rowCount(); row++)
+    {
+        QModelIndex index = cfgFileListModel.index(row, EM_COLUMN_AUTOLOAD);
+        if (cfgFileListModel.data(index).toString().compare("Yes") != 0)
+        {
+            continue;
+        }
+        index = cfgFileListModel.index(row, EM_COLUMN_GROUP_NAME);
+        group = cfgFileListModel.data(index).toString();
+        index = cfgFileListModel.index(row, EM_COLUMN_CFG_FILE_PATH);
+        filePath = cfgFileListModel.data(index).toString();
+        if (loadOneCfgFile(group, filePath))
+        {
+            loadedFileCount++;
+        }
+    }
+
+    if (loadedFileCount > 0)
+    {
+        return true;
+    }
+    return false;
 }
+
+
+bool MainWindow::loadOneCfgFile(QString &group, QString & filePath)
+{
+    QFile f(filePath);
+
+    if (! f.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return false;
+    }
+
+    QTextStream in(&f);
+    QString headerMagic = in.readLine();
+    if (headerMagic.compare(APP_CFG_FILE_MAGIC_HEADER) != 0)
+    {
+        return false;
+    }
+    while (! in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList row = line.split(CfgFileColumnSep);
+        //qDebug() << row;
+        if (row.count() < 2)
+        {
+            f.close();
+            return false;
+        }
+        row.append(group);
+        saveRowToSourceModel(row);
+    }
+    ui->statusBar->showMessage("Successfully loaded file: "+filePath, 3000);
+    return true;
+}
+
+void MainWindow::saveRowToSourceModel(QStringList rowInfo)
+{
+    QList<QStandardItem *> items;
+    QStandardItem * code = new QStandardItem(rowInfo[0]);
+    QStandardItem * explaining = new QStandardItem(rowInfo[1]);
+    QStandardItem * detail = new QStandardItem(rowInfo[2]);
+    QStandardItem * group = new QStandardItem(rowInfo[3]);
+
+    items.append(code);
+    items.append(explaining);
+    items.append(detail);
+    items.append(group);
+    sourceModel.appendRow(items);
+    //qDebug() << "Add row to table: " << rowInfo;
+}
+
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
 {
@@ -384,4 +466,14 @@ void MainWindow::on_pushButton_loadAllCfgFile_clicked()
     }
     ui->comboBox_chooseGroup->clear();
     ui->comboBox_chooseGroup->addItems(groups);
+    if (loadCfgFiles())
+    {
+        isCfgFileLoaded = true;
+    }
+}
+
+void MainWindow::on_pushButton_unloadAllCfgFile_clicked()
+{
+    sourceModel.clear();
+    isCfgFileLoaded = false;
 }
