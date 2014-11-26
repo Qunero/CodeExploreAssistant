@@ -235,15 +235,33 @@ void MainWindow::on_action_About_triggered()
 
 void MainWindow::on_checkBox_showDetail_toggled(bool checked)
 {
-    if (checked && !isCfgFileLoaded)
+    QMessageBox::StandardButton btn;
+    if (checked &&
+            (! ui->checkBox_autoConvert->isChecked()))
     {
-        QMessageBox::StandardButton btn
-                =
-                QMessageBox::warning(this,
-                                     "Configure Needed",
-                                     "    No Explaining File is loaded, you need configure it.\n"
-                                     "Do you want to configure it now?",
-                                     QMessageBox::Yes | QMessageBox::No);
+        // too keep the consistant 'Auto Convert' should be enable
+        btn = QMessageBox::warning(this,
+                                   "Enable Auto Convert",
+                                   "    To keep consistant of your input number, please enable 'Auto Convert'."
+                                   "Do you want to enable it now?",
+                                   QMessageBox::Yes | QMessageBox::No,
+                                   QMessageBox::Yes);
+        if (btn != QMessageBox::Yes)
+        {
+            ui->checkBox_showDetail->setChecked(false);
+            return;
+        }
+        ui->checkBox_autoConvert->setChecked(true);
+        sharedNumberValue = ui->lineEdit_hex->text().toLongLong(0, 16);
+        updateUiFromHex2Dec();
+    }
+    if (checked && !isCfgFileLoaded)
+    {       
+        btn = QMessageBox::warning(this,
+                                   "Configure Needed",
+                                   "    No Explaining File is loaded, you need configure it.\n"
+                                   "Do you want to configure it now?",
+                                   QMessageBox::Yes | QMessageBox::No);
         if (btn == QMessageBox::Yes)
         {
             ui->tabWidget->setCurrentWidget(ui->tab_configure);
