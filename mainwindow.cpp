@@ -54,7 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
     appInit();
     codeExplainingHeader << "Explaining" << "Code in Hex" << "Detail" << "Group";
     groupProxyModel.setSourceModel(&sourceModel);
+    groupProxyModel.setFilterKeyColumn(3);
     codeProxyModel.setSourceModel(&groupProxyModel);
+    codeProxyModel.setFilterKeyColumn(1);
     ui->tableView_codeDetail->setModel(&codeProxyModel);
     ui->tableView_codeDetail->sortByColumn(1, Qt::AscendingOrder);
     ui->tableView_codeDetail->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -195,6 +197,15 @@ bool MainWindow::loadCfgFiles()
     int loadedFileCount = 0;
     sourceModel.setColumnCount(4);
     sourceModel.setHorizontalHeaderLabels(codeExplainingHeader);
+
+    // update groups in explore page
+    QStringList groups("ALL");
+    for (int row=0; row < cfgFileListModel.rowCount(); row++) {
+        groups.append(cfgFileListModel.item(row,0)->data(Qt::DisplayRole).toString());
+    }
+    ui->comboBox_chooseGroup->clear();
+    ui->comboBox_chooseGroup->addItems(groups);
+
     for (int row=0; row<cfgFileListModel.rowCount(); row++)
     {
         QModelIndex index = cfgFileListModel.index(row, EM_COLUMN_AUTOLOAD);
@@ -214,6 +225,7 @@ bool MainWindow::loadCfgFiles()
 
     if (loadedFileCount > 0)
     {
+        ui->statusBar->showMessage(QString("Successfully loaded %1 files.").arg(loadedFileCount), 5000);
         return true;
     }
     return false;
@@ -268,6 +280,21 @@ void MainWindow::saveRowToSourceModel(QStringList rowInfo)
     //qDebug() << "Add row to table: " << rowInfo;
 }
 
+void MainWindow::applyCodeFilter(bool clear)
+{
+    if (! ui->checkBox_showDetail->isChecked())
+    {
+        return;
+    }
+
+    if (clear)
+    {
+        codeProxyModel.setFilterRegExp(".*");
+        return;
+    }
+    QString hex = QString::number(sharedNumberValue, 16);
+    codeProxyModel.setFilterFixedString("0X"+hex);
+}
 
 void MainWindow::on_checkBox_autoConvert_toggled(bool checked)
 {
@@ -295,6 +322,15 @@ void MainWindow::on_lineEdit_dec_textChanged(const QString &arg1)
     {
         sharedNumberValue = arg1.toLongLong(0, 10);
         updateUiFromDec2Hex();
+        if (arg1.isEmpty())
+        {
+            ui->lineEdit_hex->text().clear();
+            applyCodeFilter(true);
+        }
+        else
+        {
+            applyCodeFilter(false);
+        }
     }
 }
 
@@ -305,6 +341,15 @@ void MainWindow::on_lineEdit_hex_textChanged(const QString &arg1)
     {
         sharedNumberValue = arg1.toLongLong(0, 16);
         updateUiFromHex2Dec();
+        if (arg1.isEmpty())
+        {
+            ui->lineEdit_dec->text().clear();
+            applyCodeFilter(true);
+        }
+        else
+        {
+            applyCodeFilter(false);
+        }
     }
 }
 
@@ -459,13 +504,6 @@ void MainWindow::on_lineEdit_cfgFilePath_textChanged(const QString &arg1)
 
 void MainWindow::on_pushButton_loadAllCfgFile_clicked()
 {
-    // update groups in explore page
-    QStringList groups("All");
-    for (int row=0; row < cfgFileListModel.rowCount(); row++) {
-        groups.append(cfgFileListModel.item(row,0)->data(Qt::DisplayRole).toString());
-    }
-    ui->comboBox_chooseGroup->clear();
-    ui->comboBox_chooseGroup->addItems(groups);
     if (loadCfgFiles())
     {
         isCfgFileLoaded = true;
@@ -476,4 +514,15 @@ void MainWindow::on_pushButton_unloadAllCfgFile_clicked()
 {
     sourceModel.clear();
     isCfgFileLoaded = false;
+}
+
+void MainWindow::on_comboBox_chooseGroup_currentIndexChanged(const QString &arg1)
+{
+    if (ui->comboBox_chooseGroup->currentIndex() == 0
+            && arg1.compare("ALL") == 0)
+    {
+        groupProxyModel.setFilterRegExp(".*");
+        return;
+    }
+    groupProxyModel.setFilterFixedString(arg1);
 }

@@ -302,7 +302,7 @@
                </property>
                <item>
                 <property name="text">
-                 <string>All</string>
+                 <string>ALL</string>
                 </property>
                </item>
               </widget>

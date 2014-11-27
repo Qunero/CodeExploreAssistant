@@ -1,5 +1,5 @@
 ﻿/*CEA_CFG_FILE*/
-EM_COLUMN_GROUP_NAME // 0 // Column for Group Name
-EM_COLUMN_AUTOLOAD // 1 // Enable autoload When this column contains Yes
-EM_COLUMN_CFG_FILE_PATH // 2 // 文件路径
-EM_COLOUM_COUNT // 3 // 枚举最大值
+EM_COLUMN_GROUP_NAME//0X0//Column for Group Name
+EM_COLUMN_AUTOLOAD//0X1//Enable autoload When this column contains Yes
+EM_COLUMN_CFG_FILE_PATH//0X2//文件路径
+EM_COLOUM_COUNT//0X3//枚举最大值

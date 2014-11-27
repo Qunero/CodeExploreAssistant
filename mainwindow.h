@@ -18,7 +18,7 @@ class MainWindow;
 
 const QString APP_INIT_FILE_PATH = "config/cea.ini";
 const QString APP_CFG_FILE_MAGIC_HEADER = "/*CEA_CFG_FILE*/";
-const QString CfgFileColumnSep = " // ";
+const QString CfgFileColumnSep = "//";
 
 enum{
     EM_COLUMN_GROUP_NAME     = 0,
@@ -70,6 +70,8 @@ private slots:
 
     void on_pushButton_unloadAllCfgFile_clicked();
 
+    void on_comboBox_chooseGroup_currentIndexChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     bool isCfgFileLoaded;
@@ -95,6 +97,8 @@ private:
     bool loadCfgFiles();
     bool loadOneCfgFile(QString &group, QString &filePath);
     void saveRowToSourceModel(QStringList rowInfo);
+    void applyCodeFilter(bool clear);
+    void applyGroupFileter();
 };
 
 #endif // MAINWINDOW_H
