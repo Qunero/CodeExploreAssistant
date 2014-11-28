@@ -83,6 +83,10 @@ private slots:
 
     void on_comboBox_chooseGroup_currentIndexChanged(const QString &arg1);
 
+    void on_pushButton_loadCfgFile_clicked();
+
+    void on_pushButton_saveCfgFileList_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool isCfgFileLoaded;

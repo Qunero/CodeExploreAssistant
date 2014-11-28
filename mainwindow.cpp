@@ -183,7 +183,7 @@ bool MainWindow::appInit()
     {
         QString line = in.readLine();
         QStringList row = line.split(CfgFileColumnSep);
-        qDebug() << row;
+        //qDebug() << row;
         if (row.count() < 2)
         {
             iniFile.close();
@@ -277,8 +277,8 @@ void MainWindow::saveRowToSourceModel(QStringList rowInfo)
     QStandardItem * detail = new QStandardItem(rowInfo[EM_SHOW_DETAIL_DETAIL]);
     QStandardItem * group = new QStandardItem(rowInfo[EM_SHOW_DETAIL_GROUP]);
 
-    items.append(code);
     items.append(explaining);
+    items.append(code);
     items.append(detail);
     items.append(group);
     sourceModel.appendRow(items);
@@ -530,4 +530,34 @@ void MainWindow::on_comboBox_chooseGroup_currentIndexChanged(const QString &arg1
         return;
     }
     groupProxyModel.setFilterFixedString(arg1);
+}
+
+void MainWindow::on_pushButton_loadCfgFile_clicked()
+{
+    if (! hasValidSelectedCfgFile())
+    {
+        return;
+    }
+    QString group;
+    QString filePath;
+
+    // update groups in explore page, delte after added model for 'Choose Group'
+    QStringList groups("ALL");
+    for (int row=0; row < cfgFileListModel.rowCount(); row++) {
+        groups.append(cfgFileListModel.item(row,0)->data(Qt::DisplayRole).toString());
+    }
+    ui->comboBox_chooseGroup->clear();
+    ui->comboBox_chooseGroup->addItems(groups);
+
+    int row = ui->tableView_configuredFileList->currentIndex().row();
+    QModelIndex index = cfgFileListModel.index(row, EM_CFGFILE_LIST_GROUP_NAME);
+    group = cfgFileListModel.data(index).toString();
+    index = cfgFileListModel.index(row, EM_CFGFILE_LIST_CFG_FILE_PATH);
+    filePath = cfgFileListModel.data(index).toString();
+    loadOneCfgFile(group, filePath);
+}
+
+void MainWindow::on_pushButton_saveCfgFileList_clicked()
+{
+    // TODO
 }
