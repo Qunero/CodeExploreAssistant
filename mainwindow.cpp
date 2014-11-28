@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_dec->setValidator(new QRegExpValidator(reDec));
     QRegExp reHex("(0[Xx])?0*[A-Fa-f0-9]{0,15}\\s*"); // max is 0x7fffffffffffffff
     ui->lineEdit_hex->setValidator(new QRegExpValidator(reHex));
+    ui->checkBox_autoConvert->toggled(true);
     ui->checkBox_autoConvert->setChecked(true);
     ui->pushButtonConvertDec2Hex->setDefault(true);
     ui->lineEdit_dec->setFocus();
@@ -40,10 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // for MVC
     QStringList headerLabels;
-    headerLabels.insert(EM_COLUMN_GROUP_NAME, "Group Name");
-    headerLabels.insert(EM_COLUMN_AUTOLOAD, "Autoload");
-    headerLabels.insert(EM_COLUMN_CFG_FILE_PATH, "File Path");
-    cfgFileListModel.setColumnCount(EM_COLOUM_COUNT);
+    headerLabels.insert(EM_CFGFILE_LIST_GROUP_NAME, "Group Name");
+    headerLabels.insert(EM_CFGFILE_LIST_AUTOLOAD, "Autoload");
+    headerLabels.insert(EM_CFGFILE_LIST_CFG_FILE_PATH, "File Path");
+    cfgFileListModel.setColumnCount(EM_CFGFILE_LIST_COUNT);
     cfgFileListModel.setHorizontalHeaderLabels(headerLabels);
     ui->tableView_configuredFileList->setModel(&cfgFileListModel);
     // set read only and select whole row at once
@@ -113,9 +114,9 @@ void MainWindow::clearChoosenFileInfo()
 
 void MainWindow::updateChoosenFileInfo(QStringList rowInfo)
 {
-    ui->lineEdit_groupName->setText(rowInfo[EM_COLUMN_GROUP_NAME]);
-    ui->checkBox_autoloadCfgFile->setChecked(rowInfo[EM_COLUMN_AUTOLOAD].compare("Yes", Qt::CaseInsensitive)==0?true:false);
-    ui->lineEdit_cfgFilePath->setText(rowInfo[EM_COLUMN_CFG_FILE_PATH]);
+    ui->lineEdit_groupName->setText(rowInfo[EM_CFGFILE_LIST_GROUP_NAME]);
+    ui->checkBox_autoloadCfgFile->setChecked(rowInfo[EM_CFGFILE_LIST_AUTOLOAD].compare("Yes", Qt::CaseInsensitive)==0?true:false);
+    ui->lineEdit_cfgFilePath->setText(rowInfo[EM_CFGFILE_LIST_CFG_FILE_PATH]);
 }
 
 bool MainWindow::hasValidSelectedCfgFile()
@@ -141,15 +142,15 @@ void MainWindow::saveRowToCfgFileListModel(QStringList rowInfo)
 {
     // save choosen configure file to list
     QList<QStandardItem *> items;
-    QStandardItem * groupNameItem = new QStandardItem(rowInfo[EM_COLUMN_GROUP_NAME]);
-    QStandardItem * autoloadItem = new QStandardItem(rowInfo[EM_COLUMN_AUTOLOAD]);
-    QStandardItem * filePathItem = new QStandardItem(rowInfo[EM_COLUMN_CFG_FILE_PATH]);
+    QStandardItem * groupNameItem = new QStandardItem(rowInfo[EM_CFGFILE_LIST_GROUP_NAME]);
+    QStandardItem * autoloadItem = new QStandardItem(rowInfo[EM_CFGFILE_LIST_AUTOLOAD]);
+    QStandardItem * filePathItem = new QStandardItem(rowInfo[EM_CFGFILE_LIST_CFG_FILE_PATH]);
 
     if (isInModifyCfgFileGroupInfoState)
     {
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_GROUP_NAME, groupNameItem);
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_AUTOLOAD, autoloadItem);
-        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_COLUMN_CFG_FILE_PATH, filePathItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_CFGFILE_LIST_GROUP_NAME, groupNameItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_CFGFILE_LIST_AUTOLOAD, autoloadItem);
+        cfgFileListModel.setItem(currentRowOfCfgFileList, EM_CFGFILE_LIST_CFG_FILE_PATH, filePathItem);
         qDebug() << "Save Cfg File to list: " << rowInfo;
     }
     else
@@ -211,14 +212,14 @@ bool MainWindow::loadCfgFiles()
 
     for (int row=0; row<cfgFileListModel.rowCount(); row++)
     {
-        QModelIndex index = cfgFileListModel.index(row, EM_COLUMN_AUTOLOAD);
+        QModelIndex index = cfgFileListModel.index(row, EM_CFGFILE_LIST_AUTOLOAD);
         if (cfgFileListModel.data(index).toString().compare("Yes") != 0)
         {
             continue;
         }
-        index = cfgFileListModel.index(row, EM_COLUMN_GROUP_NAME);
+        index = cfgFileListModel.index(row, EM_CFGFILE_LIST_GROUP_NAME);
         group = cfgFileListModel.data(index).toString();
-        index = cfgFileListModel.index(row, EM_COLUMN_CFG_FILE_PATH);
+        index = cfgFileListModel.index(row, EM_CFGFILE_LIST_CFG_FILE_PATH);
         filePath = cfgFileListModel.data(index).toString();
         if (loadOneCfgFile(group, filePath))
         {
@@ -248,6 +249,7 @@ bool MainWindow::loadOneCfgFile(QString &group, QString & filePath)
     QString headerMagic = in.readLine();
     if (headerMagic.compare(APP_CFG_FILE_MAGIC_HEADER) != 0)
     {
+        ui->statusBar->showMessage(QString("File<%1> is not a valid Configure file!!! please check the content").arg(filePath), 3000);
         return false;
     }
     while (! in.atEnd())
@@ -255,25 +257,25 @@ bool MainWindow::loadOneCfgFile(QString &group, QString & filePath)
         QString line = in.readLine();
         QStringList row = line.split(CfgFileColumnSep);
         //qDebug() << row;
-        if (row.count() < 2)
+        if (row.count() < CFGFILE_CONTENT_COLUMN_COUNT)
         {
-            f.close();
-            return false;
+            // EM_SHOW_DETAIL_DETAIL is not a must, ignore the other invalid lines
+            continue;
         }
         row.append(group);
         saveRowToSourceModel(row);
     }
-    ui->statusBar->showMessage("Successfully loaded file: "+filePath, 3000);
+    ui->statusBar->showMessage(QString("Successfully loaded file: %1").arg(filePath), 3000);
     return true;
 }
 
 void MainWindow::saveRowToSourceModel(QStringList rowInfo)
 {
     QList<QStandardItem *> items;
-    QStandardItem * code = new QStandardItem(rowInfo[0]);
-    QStandardItem * explaining = new QStandardItem(rowInfo[1]);
-    QStandardItem * detail = new QStandardItem(rowInfo[2]);
-    QStandardItem * group = new QStandardItem(rowInfo[3]);
+    QStandardItem * explaining = new QStandardItem(rowInfo[EM_SHOW_DETAIL_EXPLAINING]);
+    QStandardItem * code = new QStandardItem(rowInfo[EM_SHOW_DETAIL_CODE]);
+    QStandardItem * detail = new QStandardItem(rowInfo[EM_SHOW_DETAIL_DETAIL]);
+    QStandardItem * group = new QStandardItem(rowInfo[EM_SHOW_DETAIL_GROUP]);
 
     items.append(code);
     items.append(explaining);

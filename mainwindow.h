@@ -21,11 +21,22 @@ const QString APP_CFG_FILE_MAGIC_HEADER = "/*CEA_CFG_FILE*/";
 const QString CfgFileColumnSep = "//";
 
 enum{
-    EM_COLUMN_GROUP_NAME     = 0,
-    EM_COLUMN_AUTOLOAD       = 1,
-    EM_COLUMN_CFG_FILE_PATH  = 2,
-    EM_COLOUM_COUNT          = 3
+    EM_CFGFILE_LIST_GROUP_NAME          = 0,
+    EM_CFGFILE_LIST_AUTOLOAD            = 1,
+    EM_CFGFILE_LIST_CFG_FILE_PATH       = 2,
+    EM_CFGFILE_LIST_COUNT               = 3
 };
+
+enum{
+    EM_SHOW_DETAIL_EXPLAINING           = 0,
+    EM_SHOW_DETAIL_CODE                 = 1,
+    EM_SHOW_DETAIL_DETAIL               = 2,
+    EM_SHOW_DETAIL_GROUP                = 3,
+    EM_SHOW_DETAIL_COUNT                = 4
+};
+
+// group name is not stored in the cfg file
+const int CFGFILE_CONTENT_COLUMN_COUNT = EM_SHOW_DETAIL_COUNT - 1;
 
 class MainWindow : public QMainWindow
 {
