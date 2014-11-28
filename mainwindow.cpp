@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_dec->setValidator(new QRegExpValidator(reDec));
     QRegExp reHex("(0[Xx])?0*[A-Fa-f0-9]{0,15}\\s*"); // max is 0x7fffffffffffffff
     ui->lineEdit_hex->setValidator(new QRegExpValidator(reHex));
-    ui->checkBox_autoConvert->toggled(true);
+    ui->checkBox_autoConvert->setChecked(true);
     ui->pushButtonConvertDec2Hex->setDefault(true);
     ui->lineEdit_dec->setFocus();
 
@@ -57,12 +57,15 @@ MainWindow::MainWindow(QWidget *parent) :
     groupProxyModel.setFilterKeyColumn(3);
     codeProxyModel.setSourceModel(&groupProxyModel);
     codeProxyModel.setFilterKeyColumn(1);
+    codeProxyModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->tableView_codeDetail->setModel(&codeProxyModel);
     ui->tableView_codeDetail->sortByColumn(1, Qt::AscendingOrder);
     ui->tableView_codeDetail->setEditTriggers(QAbstractItemView::NoEditTriggers);
     if (loadCfgFiles())
     {
         isCfgFileLoaded = true;
+        // after successfully loaded cfg file, enable the 'Show Detail' function
+        ui->checkBox_showDetail->setChecked(true);
     }
 
     QObject::connect(this->ui->tableView_configuredFileList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(modifyCfgFileGroupInfo()));
