@@ -521,6 +521,7 @@ void MainWindow::on_pushButton_unloadAllCfgFile_clicked()
 {
     sourceModel.clear();
     isCfgFileLoaded = false;
+    ui->statusBar->showMessage(QString("Successfully unloaded %1 files.").arg(cfgFileListModel.rowCount()), 5000);
 }
 
 void MainWindow::on_comboBox_chooseGroup_currentIndexChanged(const QString &arg1)
@@ -561,5 +562,36 @@ void MainWindow::on_pushButton_loadCfgFile_clicked()
 
 void MainWindow::on_pushButton_saveCfgFileList_clicked()
 {
-    // TODO
+    // open ini file
+    QFile iniFile(APP_INIT_FILE_PATH);
+    if (! iniFile.exists())
+    {
+        qDebug() << APP_INIT_FILE_PATH << " is not exists!!!";
+    }
+
+    if (! iniFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        ui->statusBar->showMessage(QString("Failed to open <%1> for write, please check.").arg(APP_INIT_FILE_PATH), 10000);
+        return;
+    }
+
+    QTextStream out(&iniFile);
+    QStringList columns;
+    QModelIndex index;
+    for (int row=0; row<cfgFileListModel.rowCount(); row++)
+    {
+        columns.clear();
+        index = cfgFileListModel.index(row, EM_CFGFILE_LIST_GROUP_NAME);
+        columns.append(cfgFileListModel.data(index).toString());
+        index = cfgFileListModel.index(row, EM_CFGFILE_LIST_AUTOLOAD);
+        columns.append(cfgFileListModel.data(index).toString());
+        index = cfgFileListModel.index(row, EM_CFGFILE_LIST_CFG_FILE_PATH);
+        columns.append(cfgFileListModel.data(index).toString());
+        out << columns.join(CfgFileColumnSep) << "\n";
+    }
+
+    iniFile.close();
+    ui->statusBar->showMessage(QString("Successfully saved configure file list to: <%1>").arg(APP_INIT_FILE_PATH), 10000);
+
+    return;
 }
