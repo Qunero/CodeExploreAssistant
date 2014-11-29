@@ -184,13 +184,14 @@ bool MainWindow::appInit()
         QString line = in.readLine();
         QStringList row = line.split(CfgFileColumnSep);
         //qDebug() << row;
-        if (row.count() < 2)
+        if (row.count() != EM_CFGFILE_LIST_COUNT)
         {
-            iniFile.close();
-            return false;
+            qDebug() << QString("In file<%1> ignore invalid line<%2>.").arg(APP_INIT_FILE_PATH, line);
+            continue;
         }
         saveRowToCfgFileListModel(row);
     }
+    iniFile.close();
     return true;
 }
 
@@ -273,7 +274,7 @@ void MainWindow::saveRowToSourceModel(QStringList rowInfo)
 {
     QList<QStandardItem *> items;
     QStandardItem * explaining = new QStandardItem(rowInfo[EM_SHOW_DETAIL_EXPLAINING]);
-    QStandardItem * code = new QStandardItem(rowInfo[EM_SHOW_DETAIL_CODE]);
+    QStandardItem * code = new QStandardItem(rowInfo[EM_SHOW_DETAIL_CODE].toUpper());
     QStandardItem * detail = new QStandardItem(rowInfo[EM_SHOW_DETAIL_DETAIL]);
     QStandardItem * group = new QStandardItem(rowInfo[EM_SHOW_DETAIL_GROUP]);
 
@@ -348,6 +349,7 @@ void MainWindow::on_lineEdit_hex_textChanged(const QString &arg1)
         updateUiFromHex2Dec();
         if (arg1.isEmpty())
         {
+            qDebug() << "clear content of hex";
             ui->lineEdit_dec->text().clear();
             applyCodeFilter(true);
         }
